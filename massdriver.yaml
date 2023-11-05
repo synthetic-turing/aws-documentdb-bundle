@@ -1,0 +1,146 @@
+# This file will be used to generate all of the schema-*.json files in a bundle
+schema: draft-07
+name: "aws-documentdb-instance-cluster"
+description: "AWS DocumentDB - Instance Based Cluster"
+source_url: github.com/YOUR_NAME_HERE/aws-documentdb-instance-cluster
+access: private
+type: "infrastructure"
+
+# schema-params.json
+# JSON Schema sans-fields above
+params:
+  required:
+    - database
+    - networking
+    - observability
+    - backup
+  properties:
+    database:
+      type: object
+      title: Database
+      required:
+        - instance_class
+        - num_instances
+      properties:
+        instance_class:
+          type: string
+          title: Instance Class
+          description: Specifies the compute and memory capacity of the instances.
+          default: db.r6g.large
+          oneOf:
+            - title: R6G (2 vCPUs, 16 GiB)
+              const: db.r6g.large
+            - title: R6G (4 vCPUs, 32 GiB)
+              const: db.r6g.xlarge
+            - title: R6G (8 vCPUs, 64 GiB)
+              const: db.r6g.2xlarge
+        num_instances:
+          title: Number of Instances
+          description: The number of instances to be deployed in your cluster
+          type: integer
+          default: 3
+          minimum: 1
+          maximum: 16
+        deletion_protection:
+          title: Deletion Protection
+          description: If the DB instance should have deletion protection enabled.
+          type: boolean
+          default: true
+    
+    networking:
+      title: Networking
+      type: object
+      properties:
+        subnet_type:
+          $md.immutable: true
+          title: Subnet Type
+          description: Deploy the database to internal subnets (cannot reach the internet) or private subnets (internet egress traffic allowed)
+          type: string
+          enum: [internal, private]
+          default: internal
+    
+    observability:
+      title: Observability
+      type: object
+      description: Advanced logging and monitoring options.
+      properties:
+        enabled_cloudwatch_logs_exports:
+          title: Enable CloudWatch Logs Exports
+          description: Enables exporting specific DocumentDB logs to CloudWatch.
+          type: array
+          uniqueItems: true
+          items:
+            type: string
+            oneOf:
+              - title: Audit
+                const: audit
+              - title: Profiler
+                const: profiler
+        enable_performance_insights:
+          title: Enable Performance Insights
+          description: Enables Performance Insights for the DB instance.
+          type: boolean
+          default: false
+    
+    backup:
+      title: Backup
+      type: object
+      required:
+        - retention_period
+      properties:
+        retention_period:
+          title: Backup Retention Period
+          description: The days to retain backups for.
+          type: integer
+          default: 1
+          minimum: 0
+        skip_final_snapshot:
+          title: Skip Final Snapshot
+          description: Determines whether a final DB snapshot is created before the DB cluster is deleted. If true is specified, no DB snapshot is created.
+          type: boolean
+          default: false
+
+# schema-connections.json
+# Named list of input connections (artifacts) (map[name]artifact)
+connections:
+  required:
+    - authentication
+    - vpc
+  properties:
+    authentication:
+      $ref: massdriver/aws-iam-role
+    vpc:
+      $ref: massdriver/aws-vpc
+
+
+# schema-artifacts.json
+# Named list of output artifacts  (map[name]artifact)
+artifacts:
+  properties: {}
+  # required:
+  #   - network
+  # properties:
+  #   network:
+  #     $ref: massdriver/aws-vpc
+
+# schema-ui.json
+# List of form customizations for params-schema
+# learn more about widgets & fields: https://docs.massdriver.cloud/bundles/custom-widgets-and-fields
+ui:
+  ui:order: [database, networking, observability, backup, "*"]
+  database:
+    ui:order:
+      - instance_class
+      - num_instances
+      - deletion_protection
+  networking:
+    ui:order:
+      - subnet_type
+  observability:
+    ui:order:
+      - enabled_cloudwatch_logs_exports
+      - enable_performance_insights
+  backup:
+    ui:order:
+      - retention_period
+      - skip_final_snapshot
