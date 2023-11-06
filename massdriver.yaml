@@ -116,12 +116,11 @@ connections:
 # schema-artifacts.json
 # Named list of output artifacts  (map[name]artifact)
 artifacts:
-  properties: {}
-  # required:
-  #   - network
-  # properties:
-  #   network:
-  #     $ref: massdriver/aws-vpc
+  required:
+    - mongodb
+  properties:
+    mongodb:
+      $ref: massdriver/mongo-authentication
 
 # schema-ui.json
 # List of form customizations for params-schema
