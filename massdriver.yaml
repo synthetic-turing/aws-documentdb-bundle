@@ -2,7 +2,7 @@
 schema: draft-07
 name: "aws-documentdb-instance-cluster"
 description: "AWS DocumentDB - Instance Based Cluster"
-source_url: github.com/YOUR_NAME_HERE/aws-documentdb-instance-cluster
+source_url: github.com/synthetic-turing/aws-documentdb-bundle
 access: private
 type: "infrastructure"
 
