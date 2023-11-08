@@ -7,7 +7,7 @@ locals {
     username = aws_docdb_cluster.main_cluster.master_username
     password = aws_docdb_cluster.main_cluster.master_password
     hostname = aws_docdb_cluster.main_cluster.endpoint
-    port     = 27017
+    port     = "${aws_docdb_cluster.main_cluster.port}"
   }
 }
 
